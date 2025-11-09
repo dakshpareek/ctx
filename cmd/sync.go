@@ -51,7 +51,7 @@ func runSync(opts syncOptions) error {
 
 	ctxDir := filepath.Join(wd, ctxDirName)
 	if !fs.Exists(ctxDir) {
-		return &types.Error{Code: types.ExitCodeUserError, Err: fmt.Errorf("not initialized. Run 'ctx init' first")}
+		return &types.Error{Code: types.ExitCodeUserError, Err: fmt.Errorf("not initialized. Run 'spine init' first")}
 	}
 
 	configPath := filepath.Join(ctxDir, configFileName)

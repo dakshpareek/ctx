@@ -4,7 +4,7 @@
 
 - `main.go` - Entry point, CLI command routing using cobra/cli library
 - `cmd/init.go` - Implementation of `ctx init` command
-- `cmd/sync.go` - Implementation of `ctx sync` command
+- `cmd/sync.go` - Implementation of `spine sync` command
 - `cmd/generate.go` - Implementation of `ctx generate` command
 - `cmd/status.go` - Implementation of `ctx status` command
 - `cmd/validate.go` - Implementation of `ctx validate` command
@@ -91,7 +91,7 @@
   - [x] 4.4 In init: Add `.code-context/` to `.gitignore` (create if missing)
   - [x] 4.5 In init: Run initial scan and create `index.json` with all files marked as "missing"
   - [x] 4.6 In init: Display success message with next steps as per PRD
-  - [x] 4.7 Create `cmd/sync.go` implementing `ctx sync` command
+  - [x] 4.7 Create `cmd/sync.go` implementing `spine sync` command
   - [x] 4.8 In sync: Load existing index, detect changes via git or mtime
   - [x] 4.9 In sync: For each file, calculate hash and update status (current/stale/missing)
   - [x] 4.10 In sync: Remove deleted files from index

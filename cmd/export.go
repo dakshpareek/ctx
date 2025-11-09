@@ -49,12 +49,12 @@ func runExport(opts exportOptions) error {
 
 	ctxDir := filepath.Join(wd, ctxDirName)
 	if !fs.Exists(ctxDir) {
-		return &types.Error{Code: types.ExitCodeUserError, Err: fmt.Errorf("not initialized. Run 'ctx init' first")}
+		return &types.Error{Code: types.ExitCodeUserError, Err: fmt.Errorf("not initialized. Run 'spine init' first")}
 	}
 
 	indexPath := filepath.Join(ctxDir, indexFileName)
 	if !fs.Exists(indexPath) {
-		return &types.Error{Code: types.ExitCodeData, Err: fmt.Errorf("missing index.json. Run 'ctx sync' to rebuild")}
+		return &types.Error{Code: types.ExitCodeData, Err: fmt.Errorf("missing index.json. Run 'spine sync' to rebuild")}
 	}
 	idx, err := index.LoadIndex(indexPath)
 	if err != nil {

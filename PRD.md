@@ -136,7 +136,7 @@ project-root/
 
 ## Command Specifications
 
-### 1. `ctx init`
+### 1. `spine init`
 
 **Purpose:** Initialize `.code-context/` structure in current directory
 
@@ -151,7 +151,7 @@ project-root/
    └── skeletons/ (empty directory)
    ```
 3. Add `.code-context/` to `.gitignore` (create if missing)
-4. Run initial scan (same as `ctx sync`)
+4. Run initial scan (same as `spine sync`)
 
 **Output:**
 ```
@@ -174,7 +174,7 @@ Next steps:
 
 ---
 
-### 2. `ctx sync`
+### 2. `spine sync`
 
 **Purpose:** Scan codebase for changes and update index
 
@@ -218,7 +218,7 @@ Run 'ctx generate' to create skeleton prompts.
 
 ---
 
-### 3. `ctx generate`
+### 3. `spine generate`
 
 **Purpose:** Generate AI prompts for skeleton creation (manual mode)
 
@@ -350,7 +350,7 @@ Stale files:
 
 ---
 
-### 5. `ctx validate`
+### 5. `spine validate`
 
 **Purpose:** Verify integrity of skeletons and index
 
@@ -386,7 +386,7 @@ Run 'ctx generate' to resolve issues.
 
 ---
 
-### 6. `ctx clean`
+### 6. `spine clean`
 
 **Purpose:** Remove orphaned skeleton files
 
@@ -406,7 +406,7 @@ Cleaning orphaned skeletons...
 
 ---
 
-### 7. `ctx rebuild`
+### 7. `spine rebuild`
 
 **Purpose:** Reset and regenerate entire context
 
@@ -437,7 +437,7 @@ Run 'ctx generate' to recreate skeletons.
 
 ---
 
-### 8. `ctx export`
+### 8. `spine export`
 
 **Purpose:** Export context for AI consumption
 
@@ -682,7 +682,7 @@ ctx rebuild --confirm
 
 ### Error Categories
 1. **User Errors** (exit code 1)
-   - Not initialized (`ctx sync` before `ctx init`)
+   - Not initialized (`spine sync` before `spine init`)
    - Invalid config
    - Missing required flags
 
@@ -730,7 +730,7 @@ ctx rebuild --confirm
 ```
 
 ### User Overrides
-Users can edit `.code-context/config.json` directly. Changes take effect on next `ctx sync`.
+Users can edit `.code-context/config.json` directly. Changes take effect on next `spine sync`.
 
 ---
 

@@ -49,7 +49,7 @@ func runInit() error {
 	if fs.Exists(ctxDir) {
 		return &types.Error{
 			Code: types.ExitCodeUserError,
-			Err:  fmt.Errorf("already initialized. Use 'ctx rebuild' to reset"),
+			Err:  fmt.Errorf("already initialized. Use 'spine rebuild' to reset"),
 		}
 	}
 

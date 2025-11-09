@@ -50,7 +50,7 @@ func runRebuild(opts rebuildOptions) error {
 
 	ctxDir := filepath.Join(wd, ctxDirName)
 	if !fs.Exists(ctxDir) {
-		return &types.Error{Code: types.ExitCodeUserError, Err: fmt.Errorf("not initialized. Run 'ctx init' first")}
+		return &types.Error{Code: types.ExitCodeUserError, Err: fmt.Errorf("not initialized. Run 'spine init' first")}
 	}
 
 	configPath := filepath.Join(ctxDir, configFileName)
@@ -119,7 +119,7 @@ func runRebuild(opts rebuildOptions) error {
 	fmt.Printf("  %s\n", display.Info("Scanning codebase..."))
 	fmt.Printf("Found %d files (all marked missing)\n", len(files))
 	fmt.Println()
-	fmt.Println("Run 'ctx generate' to recreate skeletons.")
+	fmt.Println("Run 'spine generate' to recreate skeletons.")
 
 	return nil
 }
