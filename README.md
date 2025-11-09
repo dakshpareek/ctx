@@ -39,6 +39,30 @@ echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
+## Updating
+
+### Pre-built Binary
+
+Download the latest version from [GitHub Releases](https://github.com/dakshpareek/spine/releases) and replace your existing binary:
+
+```bash
+# Assuming spine is at /usr/local/bin/spine
+tar xzf spine_vX.Y.Z_<platform>.tar.gz
+sudo mv spine /usr/local/bin/spine
+```
+
+### From Source
+
+```bash
+go install github.com/dakshpareek/spine@latest
+```
+
+Check your version:
+
+```bash
+spine --version
+```
+
 ## Quick Start
 
 ```bash
