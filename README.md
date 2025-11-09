@@ -39,6 +39,8 @@ echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
+**Note:** When installing from source, `spine --version` will show "dev". The correct version is embedded in pre-built binaries from GitHub Releases. The actual code version is correct despite the version string.
+
 ## Updating
 
 ### Pre-built Binary
