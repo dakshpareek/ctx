@@ -147,7 +147,7 @@ func runGenerate(opts generateOptions) error {
 	fmt.Fprintln(os.Stderr, "Next steps:")
 	fmt.Fprintln(os.Stderr, "  1. Create/update skeleton files at the specified paths")
 	fmt.Fprintln(os.Stderr, "  2. Update index.json with new skeleton hashes and statuses")
-	fmt.Fprintln(os.Stderr, "  3. Run 'ctx status' to verify progress")
+	fmt.Fprintln(os.Stderr, "  3. Run 'spine status' to verify progress")
 
 	return nil
 }

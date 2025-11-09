@@ -133,9 +133,9 @@ func runInit() error {
 	fmt.Println(display.Success("Index created"))
 	fmt.Println()
 	fmt.Println("Next steps:")
-	fmt.Println("  1. Run 'ctx generate' to create skeleton prompts")
+	fmt.Println("  1. Run 'spine generate' to create skeleton prompts")
 	fmt.Println("  2. Feed prompts to your AI assistant")
-	fmt.Println("  3. Run 'ctx status' to check progress")
+	fmt.Println("  3. Run 'spine status' to check progress")
 
 	return nil
 }
