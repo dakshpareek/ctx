@@ -30,7 +30,7 @@ func executeCommand(t *testing.T, dir string, args ...string) (string, string) {
 	cleanup := changeDir(t, dir)
 	defer cleanup()
 
-	cmd := NewRootCmd()
+	cmd := NewRootCmd("test")
 	var stdout, stderr bytes.Buffer
 	cmd.SetOut(&stdout)
 	cmd.SetErr(&stderr)

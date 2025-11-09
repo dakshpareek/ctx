@@ -9,8 +9,10 @@ import (
 	"github.com/dakshpareek/spine/internal/types"
 )
 
+var version = "dev"
+
 func main() {
-	root := cmd.NewRootCmd()
+	root := cmd.NewRootCmd(version)
 
 	if err := root.Execute(); err != nil {
 		exitCode := types.ExitCodeUserError

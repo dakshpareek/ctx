@@ -55,7 +55,7 @@ func TestInitSyncGenerateFlow(t *testing.T) {
 func runCommand(t *testing.T, args ...string) {
 	t.Helper()
 
-	cmd := rootcmd.NewRootCmd()
+	cmd := rootcmd.NewRootCmd("test")
 	var stdout, stderr bytes.Buffer
 	cmd.SetOut(&stdout)
 	cmd.SetErr(&stderr)
