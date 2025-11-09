@@ -1,12 +1,47 @@
 # Spine – Extract Your Codebase's Architecture
 
+[![GitHub Release](https://img.shields.io/github/v/release/dakshpareek/spine)](https://github.com/dakshpareek/spine/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Go 1.23+](https://img.shields.io/badge/Go-1.23+-00ADD8?logo=go)](https://golang.org)
+
 Maintain an AI-ready snapshot of your codebase. `spine` extracts the structural skeleton of your project into a lightweight `.code-context/` workspace so coding assistants can understand architecture before they touch your source files.
+
+## Installation
+
+### Option 1: Pre-built Binary (Recommended)
+
+Download from [GitHub Releases](https://github.com/dakshpareek/spine/releases):
+
+```bash
+# macOS (Apple Silicon)
+tar xzf spine_v1.0.0_darwin_arm64.tar.gz
+sudo mv spine /usr/local/bin/
+
+# macOS (Intel)
+tar xzf spine_v1.0.0_darwin_amd64.tar.gz
+sudo mv spine /usr/local/bin/
+
+# Linux
+tar xzf spine_v1.0.0_linux_amd64.tar.gz
+sudo mv spine /usr/local/bin/
+```
+
+### Option 2: From Source (requires Go 1.23+)
+
+```bash
+go install github.com/dakshpareek/spine@latest
+```
+
+Ensure `$HOME/go/bin` is in your PATH:
+
+```bash
+echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
 
 ## Quick Start
 
 ```bash
-go install github.com/dakshpareek/spine@latest
-
 cd /path/to/project
 spine init                # bootstrap .code-context and initial index
 spine generate --output prompt.md
@@ -46,29 +81,38 @@ go test ./... -cover
 
 Integration coverage lives in `main_test.go`, exercising the init → sync → generate flow end-to-end using sample fixtures.
 
-## Development & Distribution
-
-We ship cross-platform binaries via [GoReleaser](https://goreleaser.com/). See `.goreleaser.yml` for the current configuration.
+## Development
 
 ### Building Locally
 
 ```bash
-go build .          # Build for current platform
-./spine --help      # Test the binary
-
-# Build for all platforms (requires GoReleaser)
-goreleaser build --snapshot --clean
+git clone https://github.com/dakshpareek/spine.git
+cd spine
+go build .
+./spine --help
 ```
 
-> Note: GoReleaser must be installed locally (`brew install goreleaser` or `go install github.com/goreleaser/goreleaser@latest`).
+### Running Tests
 
-## Badges
+```bash
+go test ./... -v -cover
+```
 
-Add badges once CI and releases are wired up:
+### Releasing
 
-- Build Status
-- Go Report Card
-- License
+Releases are automated via GitHub Actions. To create a release:
+
+```bash
+git tag -a v1.0.1 -m "Release v1.0.1"
+git push origin v1.0.1
+```
+
+This triggers the release workflow which:
+1. Runs all tests
+2. Builds binaries for all platforms via [GoReleaser](https://goreleaser.com/)
+3. Creates a GitHub Release with downloadable artifacts
+
+See [.goreleaser.yml](.goreleaser.yml) for build configuration.
 
 ## License
 
