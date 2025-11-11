@@ -81,3 +81,25 @@ func captureOutput(t *testing.T, fn func()) string {
 	}
 	return string(data)
 }
+
+func execAndCaptureStdout(t *testing.T, dir string, args ...string) string {
+	t.Helper()
+	return captureOutput(t, func() {
+		_, _ = executeCommand(t, dir, args...)
+	})
+}
+
+func executeCommandAllowError(t *testing.T, dir string, args ...string) (string, string, error) {
+	t.Helper()
+	cleanup := changeDir(t, dir)
+	defer cleanup()
+
+	cmd := NewRootCmd("test")
+	var stdout, stderr bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetErr(&stderr)
+	cmd.SetArgs(args)
+
+	err := cmd.Execute()
+	return stdout.String(), stderr.String(), err
+}

@@ -1,102 +1,130 @@
 # Command Reference
 
-`ctx` exposes a collection of commands for managing your `.ctx/` workspace. Each command accepts `--help` for detailed usage.
+`ctx` exposes two groups of commands: the guided “core workflow” that most developers use day-to-day, and “advanced” commands for fine-grained control or scripting. Every command accepts `--help` for detailed usage.
 
-## `ctx init`
+---
 
-Initializes `.ctx/` in the current directory.
+## Core Workflow
+
+### `ctx init`
+
+Bootstrap `.ctx/` in the current directory.
 
 - Creates `config.json`, `index.json`, and `skeletons/`.
 - Adds `.ctx/` to `.gitignore`.
-- Scans the project and marks files as `missing`.
+- Performs the initial scan, marking files as `missing`.
+- Safe to run once per project; use `ctx rebuild --confirm` to start over.
 
-> Run from your project root. If the workspace already exists, use `ctx rebuild --confirm`.
+### `ctx ask`
 
-## `ctx sync`
+Syncs the index and generates a prompt for files needing skeleton work.
 
-Scans your project for changes.
-
-Flags:
-
-- `--full` – force a full scan (ignore Git diffs).
-- `--verbose`, `-v` – list individual file changes.
-
-Behaviour:
-
-- Updated files → `stale`
-- New files → `missing`
-- Removed files → deleted from index
-
-## `ctx generate`
-
-Builds a Markdown prompt for an AI assistant to generate skeletons.
+- Writes the prompt to `.ctx/prompt.md` (override with `--output`).
+- Prints the prompt unless `--quiet` is supplied.
+- Automatically marks targeted files as `pendingGeneration`.
 
 Flags:
 
-- `--filter` – statuses to include (`stale`, `missing`, `current`, `pending`).
-- `--files` – comma-separated file paths to target explicitly.
-- `--output`, `-o` – write prompt to a file (stdout by default).
+- `--files` – focus on a specific comma-separated list.
+- `--filter` – override the default statuses (`pending,stale,missing`).
+- `--output`, `-o` – explicit prompt path.
+- `--quiet`, `-q` – suppress prompt body on stdout.
 
-Post-conditions:
+### `ctx update`
 
-- Selected entries are marked as `pendingGeneration`.
-- Prompts include source code, skeleton paths, and index update instructions.
+Marks skeletons current after you save AI output.
 
-## `ctx pipeline`
+- Wraps `ctx validate --fix`.
+- Shows before/after stats (`current`, `stale`, `missing`, `pending`).
+- Warns if work remains so you can rerun `ctx ask`.
 
-Runs `sync` and `generate` back-to-back.
+### `ctx bundle`
 
-Flags:
+Exports all current skeletons into a single artifact.
 
-- `--full` – force a full scan before generating.
-- `--verbose`, `-v` – show detailed sync output.
-- `--filter`, `--files`, `--output` – same as `ctx generate`.
-
-Use this when you want a single step before copying the prompt to your AI assistant.
-
-## `ctx status`
-
-Displays index statistics.
+- Default path: `.ctx/context.md` (or `.ctx/context.json` with `--format json`).
+- Helpful before pairing sessions or when handing context to a teammate.
 
 Flags:
 
-- `--verbose`, `-v` – lists files by status.
-- `--json` – emits machine-readable JSON.
+- `--output`, `-o` – custom destination.
+- `--format` – `markdown` (default) or `json`.
 
-## `ctx validate`
+### `ctx status`
 
-Checks integrity between source files, skeletons, and index metadata.
-
-Flags:
-
-- `--fix` – automatically mark stale/missing entries and repair hashes.
-- `--strict` – non-zero exit code if issues are detected.
-
-## `ctx clean`
-
-Removes orphaned skeleton files within `.ctx/skeletons/` and prunes empty directories.
-
-## `ctx rebuild`
-
-Resets the `.ctx/` workspace (destructive).
+Displays index summary and optional file-level details.
 
 Flags:
 
-- `--confirm` – required safety flag.
+- `--verbose`, `-v` – list files grouped by status.
+- `--json` – emit machine-readable JSON.
+
+---
+
+## Advanced Commands
+
+These commands remain available for scripts or specialized flows. The guided workflow (`init → ask → update → bundle`) should cover daily use.
+
+### `ctx sync`
+
+Scan the project for changes and update the index only.
+
+Flags:
+
+- `--full` – ignore Git hints and rescan the entire repo.
+- `--verbose`, `-v` – print file-by-file changes.
+
+### `ctx generate`
+
+Build a prompt without the convenience wrapper provided by `ctx ask`.
+
+Flags:
+
+- `--filter` – statuses to include (`pending`, `stale`, `missing`, `current`).
+- `--files` – comma-separated paths.
+- `--output`, `-o` – prompt destination (default `.ctx/prompt.md`).
+- `--quiet`, `-q` – suppress prompt body.
+
+### `ctx pipeline`
+
+Run `sync` then `generate` in one command—useful in automation.
+
+Flags mirror `ctx sync` and `ctx generate`.
+
+### `ctx validate`
+
+Check consistency between source files, skeletons, and index metadata.
+
+Flags:
+
+- `--fix` – repair common issues (hash mismatches, missing skeletons).
+- `--strict` – exit non-zero when issues remain.
+
+### `ctx clean`
+
+Remove orphaned skeleton files from `.ctx/skeletons/` and prune empty folders.
+
+### `ctx rebuild`
+
+Reset the entire `.ctx/` workspace (destructive).
 
 Steps:
 
-1. Deletes all skeletons.
-2. Resets the index.
-3. Performs a full scan.
+1. Delete all skeletons.
+2. Reset the index.
+3. Perform a full scan.
 
-## `ctx export`
+Requires `--confirm` to proceed.
 
-Collects all `current` skeletons into a single artifact.
+### `ctx export`
+
+Collect all `current` skeletons into one bundle.
 
 Flags:
 
 - `--format` – `markdown` (default) or `json`.
-- `--output`, `-o` – write export to a file (stdout by default).
+- `--output`, `-o` – write export to a file (stdout when omitted).
 
-Use this before long coding sessions to preload context into an AI assistant.
+---
+
+For automation-friendly recipes using these advanced commands, check out [`docs/examples.md`](./examples.md).

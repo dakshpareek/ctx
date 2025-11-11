@@ -22,24 +22,28 @@ type generateOptions struct {
 	filter string
 	files  string
 	output string
+	quiet  bool
 }
 
 func newGenerateCmd() *cobra.Command {
 	opts := generateOptions{
-		filter: "stale,missing",
+		filter: "pending,stale,missing",
 	}
 
 	cmd := &cobra.Command{
 		Use:   "generate",
 		Short: "Generate AI prompts for creating/updating skeletons",
+		Long:  advancedDescription,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			printAdvancedNotice("ctx ask")
 			return runGenerate(opts)
 		},
 	}
 
 	cmd.Flags().StringVar(&opts.filter, "filter", opts.filter, "comma-separated statuses to include (stale,missing)")
 	cmd.Flags().StringVar(&opts.files, "files", "", "comma-separated list of specific files to include")
-	cmd.Flags().StringVarP(&opts.output, "output", "o", "", "write prompt to file instead of stdout")
+	cmd.Flags().StringVarP(&opts.output, "output", "o", "", "write prompt to a specific file")
+	cmd.Flags().BoolVarP(&opts.quiet, "quiet", "q", false, "Suppress prompt body (still writes to file)")
 
 	return cmd
 }
@@ -127,27 +131,27 @@ func runGenerate(opts generateOptions) error {
 		return &types.Error{Code: types.ExitCodeFileSystem, Err: err}
 	}
 
-	if opts.output != "" {
-		if err := fs.WriteFile(opts.output, []byte(output)); err != nil {
-			return &types.Error{Code: types.ExitCodeFileSystem, Err: err}
-		}
-		fmt.Println(display.Success("Generated prompts for %d file(s)", len(selected)))
-		fmt.Println(display.Info("Prompt saved to %s", opts.output))
-		fmt.Println("Next steps:")
-		fmt.Println("  1. Paste the prompt into your AI assistant")
-		fmt.Println("  2. Create/update skeleton files at the specified paths")
-		fmt.Println("  3. Update index entries with new skeleton hashes")
+	outputPath := opts.output
+	if outputPath == "" {
+		outputPath = filepath.Join(ctxDir, "prompt.md")
+	}
+
+	if err := fs.WriteFile(outputPath, []byte(output)); err != nil {
+		return &types.Error{Code: types.ExitCodeFileSystem, Err: err}
+	}
+
+	fmt.Println(display.Success("Generated prompts for %d file(s)", len(selected)))
+	fmt.Println(display.Info("Prompt saved to %s", outputPath))
+	fmt.Println("Next steps:")
+	fmt.Println("  1. Paste the prompt into your AI assistant")
+	fmt.Println("  2. Create/update skeleton files at the specified paths")
+	fmt.Println("  3. Update index entries with new skeleton hashes")
+
+	if opts.quiet {
 		return nil
 	}
 
 	fmt.Print(output)
-
-	fmt.Fprintln(os.Stderr, display.Success("Generated prompts for %d file(s)", len(selected)))
-	fmt.Fprintln(os.Stderr, display.Info("Copy the prompt above into your AI assistant"))
-	fmt.Fprintln(os.Stderr, "Next steps:")
-	fmt.Fprintln(os.Stderr, "  1. Create/update skeleton files at the specified paths")
-	fmt.Fprintln(os.Stderr, "  2. Update index.json with new skeleton hashes and statuses")
-	fmt.Fprintln(os.Stderr, "  3. Run 'ctx status' to verify progress")
 
 	return nil
 }

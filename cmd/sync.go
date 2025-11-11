@@ -32,7 +32,9 @@ func newSyncCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "sync",
 		Short: "Scan codebase for changes and update index",
+		Long:  advancedDescription,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			printAdvancedNotice("ctx ask")
 			return runSync(opts)
 		},
 	}

@@ -87,35 +87,37 @@ rm $HOME/go/bin/ctx
 
 ## Quick Start
 
+### Phase 1 – First-Time Setup
+
 ```bash
 cd /path/to/project
-ctx init                # bootstrap .ctx and initial index
-ctx generate --output prompt.md
-# or combine the first two steps:
-# ctx pipeline --output prompt.md
+ctx init          # bootstrap .ctx/ and initial index
+ctx ask           # sync + generate prompt (writes .ctx/prompt.md)
+# Paste the prompt into your AI assistant and save skeletons to .ctx/skeletons/
+ctx update        # mark skeletons current after AI saves them
 ```
 
-1. Paste `prompt.md` into your AI assistant and let it create/update skeletons.
-2. Save the generated skeletons under `.ctx/skeletons/`.
-3. Run `ctx status` to confirm everything is current.
+At this point the `.ctx/` mirror matches your codebase. Run `ctx status` anytime to inspect progress.
 
-## Daily Workflow
+### Phase 2 – Daily Refresh
 
 ```bash
-ctx pipeline --output prompt.md   # sync + generate in one step
-ctx validate --fix                # mark skeletons current after AI updates
-ctx export --output context.md    # optional: share full context
+ctx ask           # auto-sync and generate prompt for changed files
+# ... AI updates skeletons ...
+ctx update        # recompute hashes and mark files current
+ctx bundle        # optional: export .ctx/context.md for pairing sessions
 ```
 
-- `ctx pipeline` runs `sync` then prints the AI prompt (or writes to a file).
-- `ctx validate --fix` recomputes hashes after you save skeletons.
-- `ctx export` collects all current skeletons for context-heavy coding sessions.
+- `ctx ask` always writes the prompt to `.ctx/prompt.md` (and prints it unless `--quiet`).
+- `ctx update` wraps validation with `--fix`, showing before/after stats.
+- `ctx bundle` gathers all current skeletons into a shareable artifact.
 
 ## Documentation
 
 - [Getting Started](docs/getting-started.md)
 - [Command Reference](docs/commands.md)
 - [Workflows](docs/workflows.md)
+- [Examples](docs/examples.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Contributing](CONTRIBUTING.md)
 

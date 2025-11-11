@@ -1,65 +1,75 @@
 # Workflows
 
-`ctx` supports several repeatable workflows to keep your context mirror up to date.
+`ctx` centers on two repeatable phases that keep your AI-ready skeletons fresh.
 
-## Daily Maintenance
+```
+┌─────────────┐     ┌─────────────┐
+│  Phase 1    │     │   Phase 2   │
+│  Setup      │──►──│  Daily Run  │
+└─────────────┘     └─────────────┘
+```
+
+## Phase 1 – First-Time Setup
+
+Goal: bootstrap `.ctx/`, capture an initial prompt, and mark skeletons current.
 
 ```bash
-ctx pipeline --output prompt.md
-# Feed prompt.md to your AI assistant and update skeletons
+ctx init
+ctx ask
+# ... share .ctx/prompt.md with your AI and save skeletons ...
+ctx update
 ctx status
 ```
 
-1. `ctx sync` identifies changed files.
-2. `ctx pipeline` runs sync and generate together (fallback: run `ctx sync` then `ctx generate` manually).
-3. After updating skeletons, rerun `ctx status` to confirm everything is `current`.
+- `ctx init` scaffolds `.ctx/`, seeds the index, and adds `.ctx/` to `.gitignore`.
+- `ctx ask` runs `sync` and writes the prompt to `.ctx/prompt.md`.
+- `ctx update` validates skeletons, marking everything current once saved.
+- `ctx status` confirms the mirror is clean.
 
-## After Large Refactors
+## Phase 2 – Daily Refresh
 
-```bash
-ctx sync --full
-ctx generate --output refactor-prompts.md
-```
-
-- The `--full` flag ignores Git history and walks the entire tree.
-- Consider splitting prompts by subsystem using `--files` to stay within token limits.
-
-## Sharing Project Context
+Goal: keep skeletons aligned with code changes as you develop.
 
 ```bash
-ctx export --output context.md
+ctx ask
+# ... AI regenerates skeletons ...
+ctx update
+ctx bundle   # optional, share .ctx/context.md with collaborators
 ```
 
-- Run this before pairing with an AI assistant or teammate.
-- `context.md` includes index stats and every `current` skeleton.
-- Use `ctx export --format json` for automation or custom tooling.
+- `ctx ask` only targets files that changed since the last update.
+- `ctx update` recomputes hashes and highlights anything still pending.
+- `ctx bundle` packages all current skeletons before pairing sessions.
 
-## Recovering from Drastic Changes
+## When to Use Advanced Commands
 
-If `.ctx/` gets out of sync with reality:
+The guided workflow covers most cases. Reach for advanced commands when you need finer control:
+
+- `ctx sync --full` – rescan the entire repo after massive refactors.
+- `ctx generate --files path/to/file.go` – build a prompt for a specific subset.
+- `ctx pipeline` – scriptable combo of sync + generate.
+- `ctx validate --fix --strict` – tighten CI gates.
+- `ctx export --format json` – automate context publishing.
+
+## Recovery Playbook
+
+If `.ctx/` drifts out of sync:
 
 ```bash
 ctx rebuild --confirm
-ctx generate --output fresh-prompts.md
+ctx ask
+# regenerate skeletons via AI
+ctx update
 ```
 
-- `ctx rebuild` wipes skeletons and rebuilds the index.
-- Follow up with `ctx generate` to recreate everything from scratch.
+Need to reset only a few files? Use `ctx generate --files` followed by your usual `ask → update` loop.
 
-## Validation Sweep
+## Automation Ideas
 
-```bash
-ctx validate --fix --strict
-```
+Until dedicated CI recipes land, consider:
 
-- Quickly rectifies missing skeletons, mismatched hashes, and stale status values.
-- `--strict` ensures CI or local scripts fail fast if problems persist.
+- `ctx ask --quiet` in pre-commit hooks to surface pending skeleton work.
+- `ctx validate --fix --strict` in CI to prevent stale mirrors.
+- Publishing the output of `ctx bundle` for asynchronous collaborators.
 
-## Automating with CI (Future Work)
-
-Once you wire up CI:
-
-- Run `go test ./...` and `ctx validate --strict` on pull requests.
-- Publish exports or prompt bundles on demand.
-
-Use the documentation in `.github/workflows/` (once added) as a template for your automation.
+See [`docs/examples.md`](./examples.md) for concrete scenarios.

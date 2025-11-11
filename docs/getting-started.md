@@ -28,55 +28,55 @@ The command:
 2. Adds `.ctx/` to `.gitignore`.
 3. Scans your project for trackable files and marks them as `missing`.
 
-## Sync Daily Changes
+## Run the Guided Workflow
+
+`ctx` breaks work into two simple phases.
+
+### Phase 1 – First-Time Setup
 
 ```bash
-ctx sync
+ctx init
+ctx ask
+# ... share .ctx/prompt.md with your AI assistant ...
+ctx update
 ```
 
-`ctx` compares tracked files with your working tree:
+What happens:
 
-- Modified files → `stale`
-- New files → `missing`
-- Deleted files → removed from index
+1. `ctx init` creates `.ctx/`, seeds the index, and adds the workspace to `.gitignore`.
+2. `ctx ask` runs `sync` + `generate`, saving the prompt to `.ctx/prompt.md`.
+3. Your AI assistant writes skeletons under `.ctx/skeletons/…`.
+4. `ctx update` recomputes hashes and marks everything current.
 
-## Generate Skeleton Prompts
+### Phase 2 – Daily Refresh
 
 ```bash
-ctx generate --filter stale,missing --output prompt.md
+ctx ask
+# ... regenerate skeletons via AI ...
+ctx update
 ```
 
-Share `prompt.md` with your AI assistant. It contains:
+- `ctx ask` only targets files flagged as `pending`, `stale`, or `missing`.
+- `ctx update` surfaces before/after stats and warns if additional files need attention.
 
-- Instructions for producing structural skeletons.
-- Source code for each selected file.
-- Paths where skeletons must be written.
+Optional extras:
 
-## Update Skeletons
+- `ctx bundle` → package all current skeletons into `.ctx/context.md`.
+- `ctx status --verbose` → inspect which files still need work.
 
-After the AI writes skeletons:
+## Advanced Controls (Optional)
 
-1. Save each skeleton to the path under `.ctx/skeletons/…`.
-2. Update `.ctx/index.json` with the new `skeletonHash`, `status: "current"`, and timestamp (or run `ctx sync` with `--full`).
+If you prefer manual control or automation hooks:
 
-## Verify Status
-
-```bash
-ctx status --verbose
-```
-
-You’ll see a summary plus detailed lists of `stale`, `missing`, and `pendingGeneration` files.
-
-## Export Context
-
-```bash
-ctx export --output context.md
-```
-
-Use the export when you start a fresh coding session and need to load complete context into your AI assistant.
+- `ctx sync --full` – rescan the entire project.
+- `ctx generate --files path/to/file.go` – build a targeted prompt.
+- `ctx pipeline` – run `sync` and `generate` together in scripts.
+- `ctx validate --fix --strict` – enforce integrity in CI.
+- `ctx export --format json` – produce machine-readable bundles.
 
 ## Next Steps
 
-- Automate skeleton updates inside your team’s workflow.
-- Track coverage with `go test ./... -cover`.
+- Explore the [Workflows](./workflows.md) guide for deeper scenarios.
+- Browse [Examples](./examples.md) for scripted usage patterns.
+- Keep your tests green with `go test ./... -cover`.
 - Contribute improvements—see [Contributing](../CONTRIBUTING.md).

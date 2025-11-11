@@ -2,6 +2,11 @@ package cmd
 
 import "github.com/spf13/cobra"
 
+const (
+	coreGroupID     = "core"
+	advancedGroupID = "advanced"
+)
+
 // NewRootCmd constructs the base CLI command for ctx.
 func NewRootCmd(version string) *cobra.Command {
 	cmd := &cobra.Command{
@@ -20,17 +25,44 @@ snapshot of your project for AI-assisted development.`,
 		return nil
 	}
 
-	cmd.AddCommand(
+	cmd.AddGroup(
+		&cobra.Group{
+			ID:    coreGroupID,
+			Title: "Core Workflow",
+		},
+		&cobra.Group{
+			ID:    advancedGroupID,
+			Title: "Advanced Commands",
+		},
+	)
+
+	coreCommands := []*cobra.Command{
 		newInitCmd(),
-		newSyncCmd(),
+		newAskCmd(),
+		newUpdateCmd(),
+		newBundleCmd(),
 		newStatusCmd(),
-		newValidateCmd(),
-		newCleanCmd(),
-		newRebuildCmd(),
+	}
+
+	for _, coreCmd := range coreCommands {
+		coreCmd.GroupID = coreGroupID
+		cmd.AddCommand(coreCmd)
+	}
+
+	advancedCommands := []*cobra.Command{
+		newSyncCmd(),
 		newGenerateCmd(),
 		newPipelineCmd(),
+		newValidateCmd(),
 		newExportCmd(),
-	)
+		newCleanCmd(),
+		newRebuildCmd(),
+	}
+
+	for _, advancedCmd := range advancedCommands {
+		advancedCmd.GroupID = advancedGroupID
+		cmd.AddCommand(advancedCmd)
+	}
 
 	return cmd
 }

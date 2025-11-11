@@ -30,7 +30,9 @@ func newExportCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export current skeletons for AI-assisted development",
+		Long:  advancedDescription,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			printAdvancedNotice("ctx bundle")
 			return runExport(opts)
 		},
 	}

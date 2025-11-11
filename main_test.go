@@ -9,9 +9,10 @@ import (
 
 	rootcmd "github.com/dakshpareek/ctx/cmd"
 	"github.com/dakshpareek/ctx/internal/index"
+	"github.com/dakshpareek/ctx/internal/types"
 )
 
-func TestInitSyncGenerateFlow(t *testing.T) {
+func TestGuidedWorkflowEndToEnd(t *testing.T) {
 	tempDir := t.TempDir()
 
 	srcDir := filepath.Join("testdata", "sample-project")
@@ -22,34 +23,56 @@ func TestInitSyncGenerateFlow(t *testing.T) {
 	withWorkingDir(t, tempDir)
 
 	runCommand(t, "init")
-	runCommand(t, "sync")
-	runCommand(t, "generate", "--output", "prompt.md")
+	runCommand(t, "ask", "--quiet")
 
 	if _, err := os.Stat(".ctx/index.json"); err != nil {
 		t.Fatalf("expected index.json to exist: %v", err)
 	}
 
-	if _, err := os.Stat("prompt.md"); err != nil {
-		t.Fatalf("expected prompt.md to be generated: %v", err)
+	promptPath := filepath.Join(".ctx", "prompt.md")
+	if _, err := os.Stat(promptPath); err != nil {
+		t.Fatalf("expected prompt.md to be generated at default location: %v", err)
+	}
+	verifyPromptContains(t, promptPath, "## Files to Process")
+
+	idx := loadIndex(t, ".")
+	entry, ok := idx.Files["src/app.go"]
+	if !ok {
+		t.Fatalf("expected src/app.go tracked in index")
+	}
+	if entry.Status != types.StatusPendingGeneration {
+		t.Fatalf("expected status pendingGeneration after ask, got %s", entry.Status)
 	}
 
-	loaded, err := index.LoadIndex(filepath.Join(".ctx", "index.json"))
+	skeletonContent := "** skeleton **\n"
+	if err := os.MkdirAll(filepath.Dir(entry.SkeletonPath), 0o755); err != nil {
+		t.Fatalf("mkdir skeleton dir: %v", err)
+	}
+	if err := os.WriteFile(entry.SkeletonPath, []byte(skeletonContent), 0o644); err != nil {
+		t.Fatalf("write skeleton: %v", err)
+	}
+
+	runCommand(t, "update")
+
+	idx = loadIndex(t, ".")
+	entry = idx.Files["src/app.go"]
+	if entry.Status != types.StatusCurrent {
+		t.Fatalf("expected status current after update, got %s", entry.Status)
+	}
+
+	runCommand(t, "bundle")
+
+	contextPath := filepath.Join(".ctx", "context.md")
+	if _, err := os.Stat(contextPath); err != nil {
+		t.Fatalf("expected context bundle at %s: %v", contextPath, err)
+	}
+	data, err := os.ReadFile(contextPath)
 	if err != nil {
-		t.Fatalf("LoadIndex: %v", err)
+		t.Fatalf("read context bundle: %v", err)
 	}
-
-	var pending int
-	for _, entry := range loaded.Files {
-		if entry.Status == "pendingGeneration" {
-			pending++
-		}
+	if !bytes.Contains(data, []byte(skeletonContent)) {
+		t.Fatalf("expected bundle to include skeleton content")
 	}
-
-	if pending == 0 {
-		t.Fatalf("expected at least one file marked pendingGeneration after generate")
-	}
-
-	verifyPromptContains(t, "prompt.md", "## Files to Process")
 }
 
 func runCommand(t *testing.T, args ...string) {
@@ -123,4 +146,13 @@ func verifyPromptContains(t *testing.T, path, substring string) {
 	if !bytes.Contains(data, []byte(substring)) {
 		t.Fatalf("expected prompt to contain %q", substring)
 	}
+}
+
+func loadIndex(t *testing.T, dir string) *types.Index {
+	t.Helper()
+	idx, err := index.LoadIndex(filepath.Join(dir, ".ctx", "index.json"))
+	if err != nil {
+		t.Fatalf("LoadIndex: %v", err)
+	}
+	return idx
 }

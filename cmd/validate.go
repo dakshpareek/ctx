@@ -32,7 +32,9 @@ func newValidateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validate",
 		Short: "Verify index, source files, and skeletons are consistent",
+		Long:  advancedDescription,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			printAdvancedNotice("ctx update")
 			return runValidate(opts)
 		},
 	}
